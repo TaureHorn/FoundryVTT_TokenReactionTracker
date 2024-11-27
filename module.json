@@ -1,7 +1,7 @@
 {
     "id": "token-reaction-tracker",
     "title": "Token Reaction Tracker",
-    "version": "0.1",
+    "version": "1.0",
     "compatibility": {
         "minimum": "12",
         "verified": "12.331"
@@ -21,13 +21,13 @@
         {
             "lang": "en",
             "name": "English",
-            "path": "en.json",
+            "path": "lang/en.json",
             "flags": {}
         }
     ],
     "url": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker",
-    "download": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/releases/download/v0.1/token-reaction-tracker_v0.1.zip",
-    "manifest": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/releases/download/v0.1/module.json"
+    "download": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/releases/download/v1.0/token-reaction-tracker_v1.0.zip",
+    "manifest": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/releases/download/v1.0/module.json"
 }
 
 
