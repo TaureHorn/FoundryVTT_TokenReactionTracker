@@ -17,11 +17,23 @@ class TRT {
         return console.log(this.ID, ' | ', ...args)
     }
 
+    static getTarget() {
+        // if not currently using token tool return
+        if (!canvas.tokens.active) return
+        const token = canvas.tokens.hover.document
+        const tokenReactionUseState = token.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED) ? true : false
+        this.setTokenReactionFlags(token, tokenReactionUseState)
+    }
+
     static prepHUD(hud, html, tokenExtra) {
         // @param {Object} hud
         // @param {HTML Collection} html 
         // @param {Object} tokenExtra
-        
+
+        if (game.settings.get(TRT.ID, 'enableOnlyInCombat') && ! game.combat) {
+            return
+        }
+
         // token data from renderTokenHUD includes more data than comes in a Token class
         //      therefore cannot be used to interact with flags 
         //      so we need to get the token from the canvas
@@ -46,17 +58,46 @@ class TRT {
     }
 
     static onButtonClick(event, hud, token, tokenReactionUseState) {
-        // inverse the boolean to toggle state
-        const bool = tokenReactionUseState ? false : true
-        this.setTokenReactionFlags(token, bool)
+        this.setTokenReactionFlags(token, tokenReactionUseState)
     }
 
-    static async setTokenReactionFlags(token, bool) {
+    static async setTokenReactionFlags(token, state) {
         // @param {Object} token --> the token to set flags on
         // @param {Boolean} bool --> whether or not the reaction has been used
+
+        // inverse the boolean to toggle state
+        const bool = state ? false : true
         await token.setFlag(this.ID, this.FLAGS.REACTION_USED, bool)
     }
+
 }
+
+Hooks.on('init', function() {
+
+    game.settings.register(TRT.ID, 'enableOnlyInCombat', {
+        name: "Enable in combat only",
+        hint: 'The reaction tracker button will only show on the token HUD when there is an active combat encounter',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+        requiresReload: false
+    })
+
+    game.keybindings.register(TRT.ID, 'launchManager', {
+        name: "Toggle token reaction state",
+        hint: "Toggles the reaction use state on a moused-over token",
+        editable: [
+            {
+                key: "KeyR",
+            }
+        ],
+        onDown: () => {
+            TRT.getTarget()
+        }
+    })
+
+})
 
 Hooks.on('renderTokenHUD', (hud, html, token) => {
     TRT.prepHUD(hud, html, token)
