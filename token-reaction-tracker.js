@@ -54,7 +54,6 @@ class TRT {
     static async setTokenReactionFlags(token, bool) {
         // @param {Object} token --> the token to set flags on
         // @param {Boolean} bool --> whether or not the reaction has been used
-        this.log('setTokenReactionFlags $TOKEN', token, 'canvas-token', canvas.tokens.controlled[0])
         await token.setFlag(this.ID, this.FLAGS.REACTION_USED, bool)
     }
 }
