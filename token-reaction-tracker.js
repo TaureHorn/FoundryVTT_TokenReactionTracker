@@ -68,6 +68,22 @@ class TRT {
         // inverse the boolean to toggle state
         const bool = state ? false : true
         await token.setFlag(this.ID, this.FLAGS.REACTION_USED, bool)
+        this.spawnScrollingText(token, bool)
+    }
+
+    static async spawnScrollingText(token, state) {
+        // @param {Object} token
+        // @param {Boolean} state -> state of reaction on flags AFTER is is set by this.setTokenReactionFlags
+
+        // calculate center position based on token size and grid size
+        const position = {
+            x: token.x + ((canvas.grid.size * token.width) * 0.5),
+            y: token.y + ((canvas.grid.size * token.height) * 0.5)
+        }
+        const message = `${state ? '-' : '+'} reaction`
+        const direction = state ? 1 : 2 // dictates which direction the text scrolls. 2 = up, 1 = down
+
+        await canvas.interface.createScrollingText(position, message, {direction: direction})
     }
 
 }
