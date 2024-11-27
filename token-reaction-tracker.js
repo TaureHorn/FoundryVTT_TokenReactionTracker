@@ -85,7 +85,7 @@ class TRT {
         const message = `${state ? '-' : '+'} reaction`
         const direction = state ? 1 : 2 // dictates which direction the text scrolls. 2 = up, 1 = down
 
-        await canvas.interface.createScrollingText(position, message, {direction: direction})
+        await canvas.interface.createScrollingText(position, message, { direction: direction })
     }
 
 }
@@ -99,7 +99,8 @@ Hooks.on('init', function() {
         config: true,
         type: Boolean,
         default: false,
-        requiresReload: false
+        requiresReload: false,
+        restricted: true
     })
 
     game.settings.register(TRT.ID, 'disableScrollingText', {
@@ -110,7 +111,17 @@ Hooks.on('init', function() {
         type: Boolean,
         default: false,
         requiresReload: false
+    })
 
+    game.settings.register(TRT.ID, 'disableAutoRefresh', {
+        name: "Disable auto refresh",
+        hint: 'Disable token reactions being auto refreshed at the start of the tokens turn in combat',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+        requiresReload: false,
+        restricted: true
     })
 
     game.keybindings.register(TRT.ID, 'launchManager', {
@@ -130,5 +141,16 @@ Hooks.on('init', function() {
 
 Hooks.on('renderTokenHUD', (hud, html, token) => {
     TRT.prepHUD(hud, html, token)
+})
+
+
+Hooks.on('combatTurnChange', async (combat, fromCombatant, toCombatant) => {
+    const token = canvas.tokens.get(toCombatant.tokenId).document
+    
+    // if auto refresh is disabled in settings, or the token hasn't already used a reaction do not trigger the state change
+    if (game.settings.get(TRT.ID, 'disableAutoRefresh') || !token.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED)) return
+    
+    const tokenReactionUseState = true
+    await TRT.setTokenReactionFlags(token, tokenReactionUseState)
 })
 
