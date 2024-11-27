@@ -19,7 +19,7 @@ class TRT {
 
     static getTarget() {
         // if not currently using token tool return
-        if (!canvas.tokens.active) return
+        if (!canvas.tokens.active || !canvas.tokens.hover) return
         const token = canvas.tokens.hover.document
         const tokenReactionUseState = token.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED) ? true : false
         this.setTokenReactionFlags(token, tokenReactionUseState)
@@ -30,7 +30,7 @@ class TRT {
         // @param {HTML Collection} html 
         // @param {Object} tokenExtra
 
-        if (game.settings.get(TRT.ID, 'enableOnlyInCombat') && ! game.combat) {
+        if (game.settings.get(TRT.ID, 'enableOnlyInCombat') && !game.combat) {
             return
         }
 
