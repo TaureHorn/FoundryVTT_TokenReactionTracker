@@ -1,0 +1,33 @@
+{
+    "id": "token-reaction-tracker",
+    "title": "Token Reaction Tracker",
+    "version": "0.1",
+    "compatibility": {
+        "minimum": "12",
+        "verified": "12.331"
+    },
+    "authors": [
+        {
+            "name": "TaureHorn",
+            "url": "https://github.com/TaureHorn",
+            "flags": {}
+        }
+    ],
+    "url": "",
+    "description": "A token HUD tracker for showing whether or not a token has used its reaction in combat",
+    "esmodules": [
+        "token-reaction-tracker.js"
+    ],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "en.json",
+            "flags": {}
+        }
+    ],
+    "download": "",
+    "manifest": ""
+}
+
+
