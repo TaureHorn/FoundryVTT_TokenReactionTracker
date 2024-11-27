@@ -75,6 +75,8 @@ class TRT {
         // @param {Object} token
         // @param {Boolean} state -> state of reaction on flags AFTER is is set by this.setTokenReactionFlags
 
+        if (game.settings.get(TRT.ID, 'disableScrollingText')) return
+
         // calculate center position based on token size and grid size
         const position = {
             x: token.x + ((canvas.grid.size * token.width) * 0.5),
@@ -98,6 +100,17 @@ Hooks.on('init', function() {
         type: Boolean,
         default: false,
         requiresReload: false
+    })
+
+    game.settings.register(TRT.ID, 'disableScrollingText', {
+        name: "Disable scrolling text",
+        hint: 'Disable the scrolling text that appears on a token when changing the tokens reaction state',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false,
+        requiresReload: false
+
     })
 
     game.keybindings.register(TRT.ID, 'launchManager', {
