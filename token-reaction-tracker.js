@@ -93,8 +93,19 @@ class TRT {
 Hooks.on('init', function() {
 
     game.settings.register(TRT.ID, 'enableOnlyInCombat', {
-        name: "Enable in combat only",
-        hint: 'The reaction tracker button will only show on the token HUD when there is an active combat encounter',
+        name: game.i18n.localize("settings.combat-only"),
+        hint: game.i18n.localize("settings.combat-only_desc"),
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+        requiresReload: false,
+        restricted: true
+    })
+
+    game.settings.register(TRT.ID, 'disableAutoRefresh', {
+        name: game.i18n.localize("settings.disable-autorefresh"),
+        hint: game.i18n.localize("settings.disable-autorefresh_desc"),
         scope: 'world',
         config: true,
         type: Boolean,
@@ -104,8 +115,8 @@ Hooks.on('init', function() {
     })
 
     game.settings.register(TRT.ID, 'disableScrollingText', {
-        name: "Disable scrolling text",
-        hint: 'Disable the scrolling text that appears on a token when changing the tokens reaction state',
+        name: game.i18n.localize("settings.disable-scrolltext"),
+        hint: game.i18n.localize("settings.disable-scrolltext_desc"),
         scope: 'client',
         config: true,
         type: Boolean,
@@ -113,20 +124,9 @@ Hooks.on('init', function() {
         requiresReload: false
     })
 
-    game.settings.register(TRT.ID, 'disableAutoRefresh', {
-        name: "Disable auto refresh",
-        hint: 'Disable token reactions being auto refreshed at the start of the tokens turn in combat',
-        scope: 'world',
-        config: true,
-        type: Boolean,
-        default: false,
-        requiresReload: false,
-        restricted: true
-    })
-
     game.keybindings.register(TRT.ID, 'launchManager', {
-        name: "Toggle token reaction state",
-        hint: "Toggles the reaction use state on a moused-over token",
+        name: game.i18n.localize("settings.toggle-token"),
+        hint: game.i18n.localize("settings.toggle-token_desc"),
         editable: [
             {
                 key: "KeyR",
