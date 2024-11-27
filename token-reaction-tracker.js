@@ -18,11 +18,19 @@ class TRT {
     }
 
     static getTarget() {
-        // if not currently using token tool return
-        if (!canvas.tokens.active || !canvas.tokens.hover) return
+        // @return {Object} target
         const token = canvas.tokens.hover.document
-        const tokenReactionUseState = token.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED) ? true : false
-        this.setTokenReactionFlags(token, tokenReactionUseState)
+        const target = {
+            token: token,
+            state: this.getTokenFlag(token),
+        }
+        return target
+    }
+
+    static getTokenFlag(token) {
+        // @param {Object} token
+        // @return {Boolean}
+        return token.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED) ? true : false
     }
 
     static prepHUD(hud, html, tokenExtra) {
@@ -30,35 +38,35 @@ class TRT {
         // @param {HTML Collection} html 
         // @param {Object} tokenExtra
 
-        if (game.settings.get(TRT.ID, 'enableOnlyInCombat') && !game.combat) {
-            return
-        }
+        // if not in combat and setting disabled out of combat return
+        if (game.settings.get(TRT.ID, 'enableOnlyInCombat') && !game.combat) return
 
         // token data from renderTokenHUD includes more data than comes in a Token class
         //      therefore cannot be used to interact with flags 
         //      so we need to get the token from the canvas
-        const canvasToken = canvas.tokens.getDocuments().find(token => token._id === tokenExtra._id)
-        if (!canvasToken) return ui.notifications.warn(`${TRT.ID} | Couldn't find a token with the appropriate ID`)
+        const token = canvas.tokens.getDocuments().find(token => token._id === tokenExtra._id)
+        if (!token) return ui.notifications.warn(`${TRT.ID} | Couldn't find a token with the appropriate ID`)
 
-        // set tokenReactionUseState based on flags.
+        // set tokenReactionUsed based on flags.
         // unset flags return undefined which is apparently falsy and will therefore turn false in the ternary
-        let tokenReactionUseState = canvasToken.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED) ? true : false
+        const tokenReactionUsed = this.getTokenFlag(token)
 
         // assemble a button
         const button = $(`
-        <div class="control-icon ${tokenReactionUseState ? 'active' : 'inactive'}" data-action="token-reaction-toggle" data-tooltip="${game.i18n.localize(tokenReactionUseState ? 'used-reaction' : 'unused-reaction')}">
+        <div id="trt-hud-button" class="control-icon ${tokenReactionUsed ? 'active' : 'inactive'}" data-action="token-reaction-toggle" data-tooltip="${game.i18n.localize(tokenReactionUsed ? 'used-reaction' : 'unused-reaction')}">
             <img src="${TRT.IMAGES.BUTTON}" />
-        </div>
-        `)
+        </div>`)
 
         // add button to ui and give it an jquery event listener
         html.find('div.right').last().append(button)
-        button.click((event) => TRT.onButtonClick(event, hud, canvasToken, tokenReactionUseState))
+        button.click((event) => TRT.onButtonClick(event, hud, token, tokenReactionUsed))
 
     }
 
-    static onButtonClick(event, hud, token, tokenReactionUseState) {
-        this.setTokenReactionFlags(token, tokenReactionUseState)
+    static onButtonClick(event, hud, token, tokenReactionUsed) {
+        // @param {Object} token
+        // @param {Boolean} tokenReactionUsed
+        this.setTokenReactionFlags(token, tokenReactionUsed)
     }
 
     static async setTokenReactionFlags(token, state) {
@@ -92,6 +100,7 @@ class TRT {
 
 Hooks.on('init', function() {
 
+    // only enables functionality when in combat
     game.settings.register(TRT.ID, 'enableOnlyInCombat', {
         name: game.i18n.localize("settings.combat-only"),
         hint: game.i18n.localize("settings.combat-only_desc"),
@@ -103,6 +112,7 @@ Hooks.on('init', function() {
         restricted: true
     })
 
+    // disables functionality to set token reactions to unused at the start of their turn in combat
     game.settings.register(TRT.ID, 'disableAutoRefresh', {
         name: game.i18n.localize("settings.disable-autorefresh"),
         hint: game.i18n.localize("settings.disable-autorefresh_desc"),
@@ -114,6 +124,7 @@ Hooks.on('init', function() {
         restricted: true
     })
 
+    // disables scrolling text triggered on token reaction state change
     game.settings.register(TRT.ID, 'disableScrollingText', {
         name: game.i18n.localize("settings.disable-scrolltext"),
         hint: game.i18n.localize("settings.disable-scrolltext_desc"),
@@ -124,7 +135,8 @@ Hooks.on('init', function() {
         requiresReload: false
     })
 
-    game.keybindings.register(TRT.ID, 'launchManager', {
+    // toggles token reaction state toggle on hovered tokens when token selection tools used
+    game.keybindings.register(TRT.ID, 'toggleTokenState', {
         name: game.i18n.localize("settings.toggle-token"),
         hint: game.i18n.localize("settings.toggle-token_desc"),
         editable: [
@@ -133,7 +145,14 @@ Hooks.on('init', function() {
             }
         ],
         onDown: () => {
-            TRT.getTarget()
+            // if not currently using token tool return
+            if (!canvas.tokens.active || !canvas.tokens.hover) return
+
+            // if not in combat and setting disabled out of combat return
+            if (game.settings.get(TRT.ID, 'enableOnlyInCombat') && !game.combat) return
+
+            const target = TRT.getTarget()
+            TRT.setTokenReactionFlags(target.token, target.state)
         }
     })
 
@@ -146,11 +165,11 @@ Hooks.on('renderTokenHUD', (hud, html, token) => {
 
 Hooks.on('combatTurnChange', async (combat, fromCombatant, toCombatant) => {
     const token = canvas.tokens.get(toCombatant.tokenId).document
-    
+
     // if auto refresh is disabled in settings, or the token hasn't already used a reaction do not trigger the state change
-    if (game.settings.get(TRT.ID, 'disableAutoRefresh') || !token.getFlag(TRT.ID, TRT.FLAGS.REACTION_USED)) return
-    
-    const tokenReactionUseState = true
-    await TRT.setTokenReactionFlags(token, tokenReactionUseState)
+    if (game.settings.get(TRT.ID, 'disableAutoRefresh') || !TRT.getTokenFlag(token)) return
+
+    const tokenReactionUsed = true
+    await TRT.setTokenReactionFlags(token, tokenReactionUsed)
 })
 
