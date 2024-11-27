@@ -13,7 +13,6 @@
             "flags": {}
         }
     ],
-    "url": "",
     "description": "A token HUD tracker for showing whether or not a token has used its reaction in combat",
     "esmodules": [
         "token-reaction-tracker.js"
@@ -26,8 +25,9 @@
             "flags": {}
         }
     ],
-    "download": "",
-    "manifest": ""
+    "url": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker",
+    "download": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/releases/download/v0.1/token-reaction-tracker_v0.1.zip",
+    "manifest": "https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/releases/download/v0.1/module.json"
 }
 
 
