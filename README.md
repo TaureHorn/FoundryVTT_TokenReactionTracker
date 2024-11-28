@@ -34,13 +34,13 @@ await tracker.unlinkAllTokens()
 Use to following macro to control a targeted token's linked tokens. Does not require you to have any tokens selected, just the target token targeted.
 ```
 const tracker = new TRT_Macros()
-await tracker.controlLinked()
+tracker.controlLinked()
 ```
 ### Log Linked
 Use the following to output the target tokenId and its linkedTokens (if any) tokenIds to the browser console. Does not require you to have any tokens selected, just the target token targeted.
 ```
 const tracker = new TRT_Macros()
-await tracker.logLinked()
+tracker.logLinked()
 ```
 ## Settings
 ### GM only
