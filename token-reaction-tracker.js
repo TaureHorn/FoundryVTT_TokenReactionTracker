@@ -6,7 +6,8 @@ class TRT {
     static ID = 'token-reaction-tracker'
 
     static FLAGS = {
-        REACTION_USED: 'reactionUsed'
+        REACTION_USED: 'reactionUsed',
+        LINKED_TOKENS: 'linkedTokens'
     }
 
     static IMAGES = {
@@ -15,6 +16,10 @@ class TRT {
 
     static log(...args) {
         return console.log(this.ID, ' | ', ...args)
+    }
+
+    static error(...args) {
+        return console.error(this.ID, ' | ', ...args)
     }
 
     static getTarget() {
@@ -97,6 +102,78 @@ class TRT {
     }
 
 }
+
+export default class TRT_Macros {
+
+    constructor() {
+        this._target = this.#validateTarget(Array.from(game.user.targets).map(token => token.document._id));
+        this._selected = this.#validateSelected(canvas.tokens.controlled.map(token => token.document._id));
+    }
+
+    #validateSelected(selectedArr) {
+        // checks if arr contains entries
+        if (selectedArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warnings.no-selected")}`)
+
+        // if targetted token in selection remove from selectedArr
+        if (selectedArr.includes(this._target)) {
+            selectedArr.splice(selectedArr.indexOf(this._target), 1)
+        }
+        return this._selected = selectedArr
+    }
+
+    #validateTarget(targetArr) {
+        // checks arr is has singular entry 
+        if (targetArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warnings.no-target")}`)
+        if (targetArr.length > 1) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warnings.multi-target")}`)
+        return this._target = targetArr[0]
+    }
+
+    get selected() {
+        return this._selected
+    }
+
+    get target() {
+        return this._target
+    }
+
+    get token() {
+        const token = canvas.tokens.get(this.target)
+        if (!token) {
+            return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warning.no-token")}`)
+        }
+        return token
+    }
+
+    async linkTokens() {
+        // @return {Promise} this.token.document
+        
+        // add array of selected token ids to the target token as linkedTokens flag
+        return await this.token.document.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, this.selected)
+    }
+
+    async unlinkAllTokens() {
+        // @return {Promise} this.token.document
+        
+        // remove linkedTokens flag from target
+        return await this.token.document.unsetFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)
+    }
+
+    async unlinkTokens() {
+        // @return {Promise} this.token.document
+        
+        const token = this.token.document
+
+        // get target flags for linked tokens and remove selected from linked tokens array
+        const flags = [...token.getFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)]
+        flags.filter(id => !this.selected.includes(id))
+
+        // update target linked tokens flags based on filter removal of selected ids
+        return await token.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, flags)
+    }
+
+}
+
+globalThis.TRT_Macros = TRT_Macros
 
 Hooks.on('init', function() {
 
