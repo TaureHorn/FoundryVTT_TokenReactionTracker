@@ -30,7 +30,7 @@ ui.notification.info('TRT Macro | successfully unlinked tokens!')
 Use the following macro to unlink ALL tokens from the combatant
 ```
 const tracker = new TRT_Macros()
-await tracker.linkAllTokens()
+await tracker.unlinkAllTokens()
 ui.notification.info('TRT Macro | successfully unlinked all tokens!')
 ```
 ## Settings
