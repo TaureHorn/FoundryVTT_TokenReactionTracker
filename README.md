@@ -13,22 +13,34 @@ If you prefer to run combat with multiple tokens/actors occupying the same spot 
 To bpyass this issue there are a few macros you can use to link all the non-combat enabled tokens to the token actually in the initiative. To use these macros, you need to target the combatants token (the one that is tracked in the initiative). You also need to select all the tokens you want to link to this combatant. Once tokens and targeted and selected, activate a macro.
 ![Macro selection scenario](https://github.com/TaureHorn/FoundryVTT_TokenReactionTracker/raw/main/macro_use.png)
 ### Link Tokens
-use the following macro to link tokens to the combatant
+Use the following macro to link tokens to the combatant.
 ```
 const tracker = new TRT_Macros()
 await tracker.linkTokens()
 ```
 ### Unlink Tokens
-Use the following macro to unlink the selected tokens from the combatant
+Use the following macro to unlink the selected tokens from the combatant.
 ```
 const tracker = new TRT_Macros()
 await tracker.unlinkTokens()
 ```
 ### Unlink All Tokens
-Use the following macro to unlink ALL tokens from the combatant
+Use the following macro to unlink ALL tokens from the combatant. Does not require you to have any tokens selected, just the target token targeted.
 ```
 const tracker = new TRT_Macros()
 await tracker.unlinkAllTokens()
+```
+### Control Linked Tokens
+Use to following macro to control a targeted token's linked tokens. Does not require you to have any tokens selected, just the target token targeted.
+```
+const tracker = new TRT_Macros()
+await tracker.controlLinked()
+```
+### Log Linked
+Use the following to output the target tokenId and its linkedTokens (if any) tokenIds to the browser console. Does not require you to have any tokens selected, just the target token targeted.
+```
+const tracker = new TRT_Macros()
+await tracker.logLinked()
 ```
 ## Settings
 ### GM only
