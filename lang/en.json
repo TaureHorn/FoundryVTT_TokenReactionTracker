@@ -5,7 +5,8 @@
         "notifications": {
             "link-success": "Successfully linked tokens to target!",
             "unlink-all": "Successfully unlinked all tokens from target!",
-            "unlink-success": "Successfully un-linked tokens from target!"
+            "unlink-success": "Successfully un-linked tokens from target!",
+            "zero-linked": "The target token does not have any linked tokens."
         },
         "settings": {
             "combat-only": "Enable only in combat",
