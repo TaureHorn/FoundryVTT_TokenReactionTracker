@@ -64,14 +64,16 @@ class TRT {
 
         // add button to ui and give it an jquery event listener
         html.find('div.right').last().append(button)
-        button.click((event) => TRT.onButtonClick(event, hud, token, tokenReactionUsed))
+        button.click(() => TRT.onButtonClick())
 
     }
 
-    static onButtonClick(event, hud, token, tokenReactionUsed) {
-        // @param {Object} token
-        // @param {Boolean} tokenReactionUsed
-        this.setTokenReactionFlags(token, tokenReactionUsed)
+    static onButtonClick() {
+        // get all controlled tokens and trigger reaction state change for them
+        canvas.tokens.controlled.forEach(async (token) => {
+            const tokenReactionUsed = this.getTokenFlag(token.document)
+            this.setTokenReactionFlags(token.document, tokenReactionUsed)
+        })
     }
 
     static async setTokenReactionFlags(token, state) {
@@ -241,12 +243,31 @@ Hooks.on('renderTokenHUD', (hud, html, token) => {
 
 
 Hooks.on('combatTurnChange', async (combat, fromCombatant, toCombatant) => {
+    // if auto refresh is disabled in settings do not trigger the state change
+    if (game.settings.get(TRT.ID, 'disableAutoRefresh')) return
+
+    let toUpdateArr = [toCombatant.tokenId]
     const token = canvas.tokens.get(toCombatant.tokenId).document
 
-    // if auto refresh is disabled in settings, or the token hasn't already used a reaction do not trigger the state change
-    if (game.settings.get(TRT.ID, 'disableAutoRefresh') || !TRT.getTokenFlag(token)) return
+    // if toCombatant has linkedTokens in flags add linkedTokens ids to toUpdateArr
+    if (token.getFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)) {
+        toUpdateArr = toUpdateArr.concat(token.getFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS))
+    }
 
-    const tokenReactionUsed = true
-    await TRT.setTokenReactionFlags(token, tokenReactionUsed)
+    // iterate through tokens to conditionally update them
+    toUpdateArr.forEach(async (id) => {
+        const token = canvas.tokens.get(id).document
+        if (!token) return
+
+        // bypass tokens with unused reactions
+        if (!TRT.getTokenFlag(token)) return
+
+        // bypass tokens that represent dead creatures
+        if (token.actor.effects._source.map(effect => effect.name === "Dead").includes(true)) return
+
+        const tokenReactionUsed = true
+        await TRT.setTokenReactionFlags(token, tokenReactionUsed)
+    })
+
 })
 
