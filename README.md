@@ -17,21 +17,18 @@ use the following macro to link tokens to the combatant
 ```
 const tracker = new TRT_Macros()
 await tracker.linkTokens()
-ui.notifications.info('TRT Macro | successfully linked tokens!')
 ```
 ### Unlink Tokens
 Use the following macro to unlink the selected tokens from the combatant
 ```
 const tracker = new TRT_Macros()
 await tracker.unlinkTokens()
-ui.notifications.info('TRT Macro | successfully unlinked tokens!')
 ```
 ### Unlink All Tokens
 Use the following macro to unlink ALL tokens from the combatant
 ```
 const tracker = new TRT_Macros()
 await tracker.unlinkAllTokens()
-ui.notifications.info('TRT Macro | successfully unlinked all tokens!')
 ```
 ## Settings
 ### GM only

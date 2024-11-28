@@ -2,6 +2,11 @@
     "TRT" : {
         "mod-title": "Token Reaction Tracker",
         "toggle-state": "Toggle Reaction State",
+        "notifications": {
+            "link-success": "Successfully linked tokens to target!",
+            "unlink-all": "Successfully unlinked all tokens from target!",
+            "unlink-success": "Successfully un-linked tokens from target!"
+        },
         "settings": {
             "combat-only": "Enable only in combat",
             "combat-only_desc": "The reaction tracker button will only show on the token HUD when there is an active combat encounter",
