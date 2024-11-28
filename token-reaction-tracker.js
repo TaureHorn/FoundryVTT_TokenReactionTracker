@@ -58,7 +58,7 @@ class TRT {
 
         // assemble a button
         const button = $(`
-        <div id="trt-hud-button" class="control-icon ${tokenReactionUsed ? 'active' : 'inactive'}" data-action="token-reaction-toggle" data-tooltip="${game.i18n.localize(tokenReactionUsed ? 'used-reaction' : 'unused-reaction')}">
+        <div id="trt-hud-button" class="control-icon ${tokenReactionUsed ? 'active' : 'inactive'}" data-action="token-reaction-toggle" data-tooltip="${game.i18n.localize('TRT.toggle-state')}">
             <img src="${TRT.IMAGES.BUTTON}" />
         </div>`)
 
@@ -112,7 +112,7 @@ export default class TRT_Macros {
 
     #validateSelected(selectedArr) {
         // checks if arr contains entries
-        if (selectedArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warnings.no-selected")}`)
+        if (selectedArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warnings.no-selected")}`)
 
         // if targetted token in selection remove from selectedArr
         if (selectedArr.includes(this._target)) {
@@ -123,8 +123,8 @@ export default class TRT_Macros {
 
     #validateTarget(targetArr) {
         // checks arr is has singular entry 
-        if (targetArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warnings.no-target")}`)
-        if (targetArr.length > 1) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warnings.multi-target")}`)
+        if (targetArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warnings.no-target")}`)
+        if (targetArr.length > 1) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warnings.multi-target")}`)
         return this._target = targetArr[0]
     }
 
@@ -139,7 +139,7 @@ export default class TRT_Macros {
     get token() {
         const token = canvas.tokens.get(this.target)
         if (!token) {
-            return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("warning.no-token")}`)
+            return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warning.no-token")}`)
         }
         return token
     }
@@ -179,8 +179,8 @@ Hooks.on('init', function() {
 
     // only enables functionality when in combat
     game.settings.register(TRT.ID, 'enableOnlyInCombat', {
-        name: game.i18n.localize("settings.combat-only"),
-        hint: game.i18n.localize("settings.combat-only_desc"),
+        name: game.i18n.localize("TRT.settings.combat-only"),
+        hint: game.i18n.localize("TRT.settings.combat-only_desc"),
         scope: 'world',
         config: true,
         type: Boolean,
@@ -191,8 +191,8 @@ Hooks.on('init', function() {
 
     // disables functionality to set token reactions to unused at the start of their turn in combat
     game.settings.register(TRT.ID, 'disableAutoRefresh', {
-        name: game.i18n.localize("settings.disable-autorefresh"),
-        hint: game.i18n.localize("settings.disable-autorefresh_desc"),
+        name: game.i18n.localize("TRT.settings.disable-autorefresh"),
+        hint: game.i18n.localize("TRT.settings.disable-autorefresh_desc"),
         scope: 'world',
         config: true,
         type: Boolean,
@@ -203,8 +203,8 @@ Hooks.on('init', function() {
 
     // disables scrolling text triggered on token reaction state change
     game.settings.register(TRT.ID, 'disableScrollingText', {
-        name: game.i18n.localize("settings.disable-scrolltext"),
-        hint: game.i18n.localize("settings.disable-scrolltext_desc"),
+        name: game.i18n.localize("TRT.settings.disable-scrolltext"),
+        hint: game.i18n.localize("TRT.settings.disable-scrolltext_desc"),
         scope: 'client',
         config: true,
         type: Boolean,
@@ -214,8 +214,8 @@ Hooks.on('init', function() {
 
     // toggles token reaction state toggle on hovered tokens when token selection tools used
     game.keybindings.register(TRT.ID, 'toggleTokenState', {
-        name: game.i18n.localize("settings.toggle-token"),
-        hint: game.i18n.localize("settings.toggle-token_desc"),
+        name: game.i18n.localize("TRT.settings.toggle-token"),
+        hint: game.i18n.localize("TRT.settings.toggle-token_desc"),
         editable: [
             {
                 key: "KeyR",
