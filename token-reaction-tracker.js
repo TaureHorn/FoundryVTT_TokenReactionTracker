@@ -113,9 +113,6 @@ export default class TRT_Macros {
     }
 
     #validateSelected(selectedArr) {
-        // checks if arr contains entries
-        if (selectedArr.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warnings.no-selected")}`)
-
         // if targetted token in selection remove from selectedArr
         if (selectedArr.includes(this._target)) {
             selectedArr.splice(selectedArr.indexOf(this._target), 1)
@@ -130,7 +127,10 @@ export default class TRT_Macros {
         return this._target = targetArr[0]
     }
 
+
     get selected() {
+        // checks if arr contains entries
+        if (this._selected.length === 0) return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warnings.no-selected")}`)
         return this._selected
     }
 
@@ -141,36 +141,69 @@ export default class TRT_Macros {
     get token() {
         const token = canvas.tokens.get(this.target)
         if (!token) {
-            return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warning.no-token")}`)
+            return ui.notifications.warn(`${TRT.ID} | ${game.i18n.localize("TRT.warnings.no-token")}`)
         }
         return token
     }
 
+    get tokenDoc() {
+        if (!this.token) return
+        return this.token.document
+    }
+
+    getLinked() {
+        // @return {Object} --> this.tokens linkedTokens flag
+        if (!this.token || !this.tokenDoc) return
+        const linkedTokens = this.tokenDoc.getFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)
+        return linkedTokens ? linkedTokens : []
+    }
+
+    #handleSetupErrors(requireSelection) {
+        // @param {Boolena} requireSelection --> operation mode of checking input requirements. true = check for selection & target, false = check for target
+        if (requireSelection) {
+            if (typeof this.target !== 'string' || typeof this.selected !== 'object') return true
+        } else {
+            if (typeof this.target !== 'string') return true
+        }
+    }
+
     async linkTokens() {
-        // @return {Promise} this.token.document
-        
-        // add array of selected token ids to the target token as linkedTokens flag
-        return await this.token.document.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, this.selected)
+        if (this.#handleSetupErrors(true)) return
+
+        // get flags and add selected tokens ids
+        let flags = [...this.getLinked()]
+        this.selected.forEach(id => flags.push(id))
+
+        // update flags
+        await this.tokenDoc.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, flags)
+        return ui.notifications.info(`${TRT.ID} | ${game.i18n.localize("TRT.notifications.link-success")}`)
+    }
+
+    async logLinked() {
+        if (this.#handleSetupErrors(false)) return
+        // return {Object} --> returns class data   
+        if (!this._target) return
+        TRT.log({ linked: this.getLinked(), target: this.target })
     }
 
     async unlinkAllTokens() {
-        // @return {Promise} this.token.document
-        
+        if (this.#handleSetupErrors(false)) return
+
         // remove linkedTokens flag from target
-        return await this.token.document.unsetFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)
+        await this.tokenDoc.unsetFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)
+        return ui.notifications.info(`${TRT.ID} | ${game.i18n.localize("TRT.notifications.unlink-all")}`)
     }
 
     async unlinkTokens() {
-        // @return {Promise} this.token.document
+        if (this.#handleSetupErrors(true)) return
         
-        const token = this.token.document
-
         // get target flags for linked tokens and remove selected from linked tokens array
-        const flags = [...token.getFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)]
-        flags.filter(id => !this.selected.includes(id))
+        let flags = [...this.getLinked()]
+        flags = flags.filter(id => !this.selected.includes(id))
 
         // update target linked tokens flags based on filter removal of selected ids
-        return await token.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, flags)
+        await this.tokenDoc.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, flags)
+        return ui.notifications.info(`${TRT.ID} | ${game.i18n.localize("TRT.notifications.unlink-success")}`)
     }
 
 }
