@@ -151,6 +151,24 @@ export default class TRT_Macros {
         return this.token.document
     }
 
+    controlLinked() {
+        if (this.#handleSetupErrors(false)) return
+
+        // if no linked tokens release control of token
+        if (this.getLinked().length === 0) {
+            canvas.tokens.controlled.forEach(token => token.release())
+            ui.notifications.info(`${TRT.ID} | ${game.i18n.localize("TRT.notifications.zero-linked")}`)
+        } else {
+            // if linked tokens iterate through array, get tokens and control them
+            this.getLinked().forEach((id, index) => {
+                const token = canvas.tokens.get(id)
+                const releaseOthers = index === 0 ? true : false
+                token.control({'releaseOthers': releaseOthers})
+            })
+        }
+
+    }
+
     getLinked() {
         // @return {Object} --> this.tokens linkedTokens flag
         if (!this.token || !this.tokenDoc) return
@@ -172,7 +190,9 @@ export default class TRT_Macros {
 
         // get flags and add selected tokens ids
         let flags = [...this.getLinked()]
-        this.selected.forEach(id => flags.push(id))
+        this.selected.forEach(id => {
+            if (!flags.includes(id)) flags.push(id)
+        })
 
         // update flags
         await this.tokenDoc.setFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS, flags)
