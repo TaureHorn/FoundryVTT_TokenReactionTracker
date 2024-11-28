@@ -181,8 +181,8 @@ export default class TRT_Macros {
 
     async logLinked() {
         if (this.#handleSetupErrors(false)) return
+
         // return {Object} --> returns class data   
-        if (!this._target) return
         TRT.log({ linked: this.getLinked(), target: this.target })
     }
 
