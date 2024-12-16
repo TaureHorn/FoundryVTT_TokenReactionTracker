@@ -161,12 +161,12 @@ export default class TRT_Macros {
         } else {
             // if linked tokens iterate through array, get tokens and control them
             this.getLinked().forEach((id, index) => {
-                const token = canvas.tokens.get(id)
+                const token = canvas.tokens.get(id) ? canvas.tokens.get(id) : false
+                if (!token) return
                 const releaseOthers = index === 0 ? true : false
                 token.control({'releaseOthers': releaseOthers})
             })
         }
-
     }
 
     getLinked() {
@@ -300,7 +300,8 @@ Hooks.on('combatTurnChange', async (combat, fromCombatant, toCombatant) => {
     if (game.settings.get(TRT.ID, 'disableAutoRefresh')) return
 
     let toUpdateArr = [toCombatant.tokenId]
-    const token = canvas.tokens.get(toCombatant.tokenId).document
+    const token = canvas.tokens.get(toCombatant.tokenId) ? canvas.tokens.get(toCombatant.tokenId).document : false
+    if (!token) return
 
     // if toCombatant has linkedTokens in flags add linkedTokens ids to toUpdateArr
     if (token.getFlag(TRT.ID, TRT.FLAGS.LINKED_TOKENS)) {
@@ -309,8 +310,8 @@ Hooks.on('combatTurnChange', async (combat, fromCombatant, toCombatant) => {
 
     // iterate through tokens to conditionally update them
     toUpdateArr.forEach(async (id) => {
-        const token = canvas.tokens.get(id).document
-        if (!token) return
+        const token = canvas.tokens.get(id) ? canvas.tokens.get(id).document : false
+        if (!token || !token.isOwner) return 
 
         // bypass tokens with unused reactions
         if (!TRT.getTokenFlag(token)) return
