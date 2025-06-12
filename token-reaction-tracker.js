@@ -56,16 +56,26 @@ class TRT {
         // unset flags return undefined which is apparently falsy and will therefore turn false in the ternary
         const tokenReactionUsed = this.getTokenFlag(token)
 
-        // assemble a button
-        const button = $(`
-        <div id="trt-hud-button" class="control-icon ${tokenReactionUsed ? 'active' : 'inactive'}" data-action="token-reaction-toggle" data-tooltip="${game.i18n.localize('TRT.toggle-state')}">
-            <img src="${TRT.IMAGES.BUTTON}" />
-        </div>`)
+        // assemble a button differently based on foundry version
+        let version = game.release.generation >= 13 ? true : false
+        let target = version ? html : html[0]
+        const button = (() => {
+            let div = document.createElement('div')
+            div.innerHTML = `
+                ${version ? '<button' : '<div'}
+                    class="control-icon ${tokenReactionUsed ? 'active' : 'inactive'}"
+                    type="button",
+                    data-action="token-reaction-toggle"
+                    data-tooltip="${game.i18n.localize("TRT.toggle-state")}">
+                        <img src="${TRT.IMAGES.BUTTON}" />
+                ${version ? '</button>' : '</div>'}`.trim()
 
-        // add button to ui and give it an jquery event listener
-        html.find('div.right').last().append(button)
-        button.click(() => TRT.onButtonClick())
+            return div.firstElementChild
+        })()
+        button.addEventListener('click', () => TRT.onButtonClick())
 
+        // add button to nodelist
+        target.querySelector('div[class="col right"]').append(button)
     }
 
     static onButtonClick() {
@@ -164,7 +174,7 @@ export default class TRT_Macros {
                 const token = canvas.tokens.get(id) ? canvas.tokens.get(id) : false
                 if (!token) return
                 const releaseOthers = index === 0 ? true : false
-                token.control({'releaseOthers': releaseOthers})
+                token.control({ 'releaseOthers': releaseOthers })
             })
         }
     }
@@ -216,7 +226,7 @@ export default class TRT_Macros {
 
     async unlinkTokens() {
         if (this.#handleSetupErrors(true)) return
-        
+
         // get target flags for linked tokens and remove selected from linked tokens array
         let flags = [...this.getLinked()]
         flags = flags.filter(id => !this.selected.includes(id))
@@ -311,7 +321,7 @@ Hooks.on('combatTurnChange', async (combat, fromCombatant, toCombatant) => {
     // iterate through tokens to conditionally update them
     toUpdateArr.forEach(async (id) => {
         const token = canvas.tokens.get(id) ? canvas.tokens.get(id).document : false
-        if (!token || !token.isOwner) return 
+        if (!token || !token.isOwner) return
 
         // bypass tokens with unused reactions
         if (!TRT.getTokenFlag(token)) return
